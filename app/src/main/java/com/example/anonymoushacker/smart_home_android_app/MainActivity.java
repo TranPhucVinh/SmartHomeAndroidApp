@@ -1,5 +1,6 @@
 package com.example.anonymoushacker.smart_home_android_app;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,8 +9,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -19,9 +25,9 @@ public class MainActivity extends AppCompatActivity {
     EditText textUsername, textPassword;
     Button signin;
 
-    String urlString = "https://smarthome-thesis-bku.herokuapp.com/";
+    String urlString = "http://192.168.1.22:3000/";
     String queryStringURL;
-    String line;
+    String line, username, password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +50,24 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Validation validation = new Validation();
                 validation.execute();
-                Toast.makeText(MainActivity.this, ""+line,Toast.LENGTH_LONG).show();
+//                textUsername.setText("");
+//                textPassword.setText("");
+                try {
+                    if (line.equalsIgnoreCase("Login sucessfully")) {
+                        Intent intent = new Intent(MainActivity.this,Dashboard.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("username",username);
+                        intent.putExtra("myBundle", bundle);
+                        startActivity(intent);
+                    } else if (line.equalsIgnoreCase("Try again")) {
+                        Toast.makeText(MainActivity.this, "Try again", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "no connection", Toast.LENGTH_LONG).show();
+                    }
+                }
+                catch (NullPointerException e){
+                    Toast.makeText(MainActivity.this, "nothing here", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -62,19 +85,22 @@ public class MainActivity extends AppCompatActivity {
             super.onProgressUpdate(values);
         }
         protected Void doInBackground(Void... values) {
-            String username = textUsername.getText().toString();
-            String password = textPassword.getText().toString();
+            username = textUsername.getText().toString();
+            password = textPassword.getText().toString();
 
             try {
                 queryStringURL = urlString + "validate?username="+username+"&password="+password;
 
                 URL url = new URL(queryStringURL);
-                HttpsURLConnection connection =  (HttpsURLConnection) url.openConnection();
+                HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
 
                 connection.setRequestMethod("POST");
                 InputStreamReader inputStreamReader = new InputStreamReader(connection.getInputStream());
                 BufferedReader buffer = new BufferedReader(inputStreamReader);
                 line = buffer.readLine();
+
+//                jsonarray = new JSONArray(line);
+//                jsonObject = jsonarray.getJSONObject(0);
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -83,4 +109,3 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
