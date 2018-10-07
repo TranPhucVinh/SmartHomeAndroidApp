@@ -27,7 +27,9 @@ public class MainActivity extends AppCompatActivity {
 
     String urlString = "http://192.168.1.22:3000/";
     String queryStringURL;
-    String line, username, password;
+    String line, username, password, returnString;
+    JSONArray jsonArray;
+    JSONObject jsonObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
 //                textUsername.setText("");
 //                textPassword.setText("");
                 try {
-                    if (line.equalsIgnoreCase("Login sucessfully")) {
+                    returnString = jsonObject.getString("message");
+                    if (returnString.equalsIgnoreCase("Login sucessfully")) {
                         Intent intent = new Intent(MainActivity.this,Dashboard.class);
                         Bundle bundle = new Bundle();
                         bundle.putString("username",username);
@@ -61,12 +64,13 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                     } else if (line.equalsIgnoreCase("Try again")) {
                         Toast.makeText(MainActivity.this, "Try again", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(MainActivity.this, "no connection", Toast.LENGTH_LONG).show();
                     }
                 }
                 catch (NullPointerException e){
                     Toast.makeText(MainActivity.this, "nothing here", Toast.LENGTH_LONG).show();
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
                 }
             }
         });
@@ -99,8 +103,8 @@ public class MainActivity extends AppCompatActivity {
                 BufferedReader buffer = new BufferedReader(inputStreamReader);
                 line = buffer.readLine();
 
-//                jsonarray = new JSONArray(line);
-//                jsonObject = jsonarray.getJSONObject(0);
+                jsonArray = new JSONArray(line);
+                jsonObject = jsonArray.getJSONObject(0);
             }
             catch (Exception e){
                 e.printStackTrace();
