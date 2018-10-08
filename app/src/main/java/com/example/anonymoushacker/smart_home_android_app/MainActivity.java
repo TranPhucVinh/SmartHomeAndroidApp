@@ -27,7 +27,10 @@ public class MainActivity extends AppCompatActivity {
 
     String urlString = "http://192.168.1.22:3000/";
     String queryStringURL;
-    String line, username, password, returnString;
+    String lineValidate, lineDashboard, username, password, returnString;
+
+    String userIdQuerystring;
+
     JSONArray jsonArray;
     JSONObject jsonObject;
 
@@ -60,9 +63,17 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent = new Intent(MainActivity.this,Dashboard.class);
                         Bundle bundle = new Bundle();
                         bundle.putString("username",username);
+
                         intent.putExtra("myBundle", bundle);
+                        while (lineDashboard == null) {
+                            DashboardView dashboardView = new DashboardView();
+                            dashboardView.execute();
+                        }
+
+                        bundle.putString("house",lineDashboard);
+
                         startActivity(intent);
-                    } else if (line.equalsIgnoreCase("Try again")) {
+                    } else if (lineValidate.equalsIgnoreCase("Try again")) {
                         Toast.makeText(MainActivity.this, "Try again", Toast.LENGTH_LONG).show();
                     }
                 }
@@ -101,10 +112,42 @@ public class MainActivity extends AppCompatActivity {
                 connection.setRequestMethod("POST");
                 InputStreamReader inputStreamReader = new InputStreamReader(connection.getInputStream());
                 BufferedReader buffer = new BufferedReader(inputStreamReader);
-                line = buffer.readLine();
+                lineValidate = buffer.readLine();
 
-                jsonArray = new JSONArray(line);
+                jsonArray = new JSONArray(lineValidate);
                 jsonObject = jsonArray.getJSONObject(0);
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+    class DashboardView extends AsyncTask<Void, Void, Void> {
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+        protected Void doInBackground(Void... values) {
+
+            try {
+                userIdQuerystring = jsonObject.getString("id");
+                queryStringURL = urlString + "app.dashboard?userid="+userIdQuerystring;
+
+                URL url = new URL(queryStringURL);
+                HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
+
+                connection.setRequestMethod("POST");
+                InputStreamReader inputStreamReader = new InputStreamReader(connection.getInputStream());
+                BufferedReader buffer = new BufferedReader(inputStreamReader);
+                lineDashboard = buffer.readLine();
             }
             catch (Exception e){
                 e.printStackTrace();
