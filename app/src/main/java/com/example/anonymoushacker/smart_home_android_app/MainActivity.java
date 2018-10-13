@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     EditText textUsername, textPassword;
     Button signin;
 
+//    String urlString = "http://192.168.40.74:3000/";
+
     String urlString = "http://192.168.1.22:3000/";
     String queryStringURL;
     String lineValidate, lineDashboard, username, password, returnString;
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                             dashboardView.execute();
                         }
 
+                        bundle.putString("userid", userIdQuerystring);
                         bundle.putString("house",lineDashboard);
 
                         startActivity(intent);
