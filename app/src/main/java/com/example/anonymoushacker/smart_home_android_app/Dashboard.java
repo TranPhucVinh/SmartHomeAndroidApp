@@ -85,42 +85,43 @@ public class Dashboard extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-//                eachHouse = houseName.get(position);
-                Toast.makeText(Dashboard.this, ""+houseName.get(position), Toast.LENGTH_LONG).show();
+                eachHouse = houseName.get(position);
+//                Toast.makeText(Dashboard.this, ""+houseName.get(position), Toast.LENGTH_LONG).show();
 
-//                while (lineHouse == null) {
-
+                HouseView houseView = new HouseView();
+                houseView.execute();
+//                while (lineHouse == null){
+//                    houseView.execute();
 //                }
+
+                if (lineHouse == null) {
+                    Toast.makeText(Dashboard.this, "NUll URL", Toast.LENGTH_LONG).show();
+                }
+                else {
+                    Toast.makeText(Dashboard.this, ""+queryStringURL, Toast.LENGTH_LONG).show();
+                }
             }
         });
 
 //        SystemClock.sleep(1000);
-//        if (eachHouse != null) {
-//            HouseView houseView = new HouseView();
-//            houseView.execute();
-//                if (lineHouse == null) {
-//                    Toast.makeText(Dashboard.this, "NUll URL", Toast.LENGTH_LONG).show();
-//                }
-//                else {
-//                    Toast.makeText(Dashboard.this, ""+queryStringURL, Toast.LENGTH_LONG).show();
-//                }
-//        }
+
+//        if (eachHouse != null)
+
     }
 
-    class HouseView extends AsyncTask<Void, Void, Void>{
+    class HouseView extends AsyncTask<Void, Void, String>{
         protected void onPreExecute() {
             super.onPreExecute();
         }
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(String aVoid) {
             super.onPostExecute(aVoid);
         }
         protected void onProgressUpdate(Void... values) {
             super.onProgressUpdate(values);
         }
-        protected Void doInBackground(Void... values) {
+        protected String doInBackground(Void... values) {
 
             try {
-
 //                queryStringURL = urlString + "app.house?userid=1&housename=House 001";
 
                 queryStringURL = urlString + "app.house?userid="+userIdQuerystring+"&housename="+eachHouse;
@@ -134,15 +135,19 @@ public class Dashboard extends AppCompatActivity {
                 InputStreamReader inputStreamReader = new InputStreamReader(connection.getInputStream());
                 BufferedReader buffer = new BufferedReader(inputStreamReader);
                 lineHouse = buffer.readLine();
+
+//                jsonArray = new JSONArray(lineHouse);
+//                jsonObject = jsonArray.getJSONObject(0);
+
 //                while (lineHouse == null){
 //                    lineHouse = buffer.readLine();
 //                }
-                buffer.close();
+
             }
             catch (Exception e){
                 e.printStackTrace();
             }
-            return null;
+            return lineHouse;
         }
     }
 }
