@@ -20,19 +20,21 @@ import java.util.concurrent.ExecutionException;
 public class MainActivity extends AppCompatActivity {
 
     EditText textUsername, textPassword;
-    Button signin, dbusername, logout;
+    Button signin, logout;
+
+    Button dbusername, houseButton, houseUser, floorButton, floorUser;
 
     String username, password;
 
     String userIdQuerystring;
-    String resultString, dashboardReturn, houseReturn;
-    String eachHouse;
+    String resultString, dashboardReturn, houseReturn, floorReturn;
+    String eachHouse, eachFloor, eachRoom;
 
-    JSONArray jsonArray, houseArray;
+    JSONArray jsonArray, houseArray, floorArray, roomArray;
     JSONObject jsonObject;
-    ListView dashboardListView;
-    ArrayAdapter<String> adapterHouses;
-    ArrayList<String> houseName;
+    ListView dashboardListView, houseListView, floorListView, roomListView;
+    ArrayAdapter<String> adapterHouses, adapterFloors, adapterRooms;
+    ArrayList<String> houseName, floorName, roomName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         textPassword = findViewById(R.id.password);
         signin = findViewById(R.id.button);
         houseName = new ArrayList<>();
+        floorName = new ArrayList<>();
+        roomName  = new ArrayList<>();
     }
 
     private void handleEvent() {
@@ -114,17 +118,17 @@ public class MainActivity extends AppCompatActivity {
                         houseName);
                 dashboardListView.setAdapter(adapterHouses);
 
-               } catch (JSONException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-                dashboardListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        eachHouse = houseName.get(position);
-                        houseClickEvent();
-                    }
-                });
+            dashboardListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    eachHouse = houseName.get(position);
+                    houseClickEvent();
+                }
+            });
         }
     }
 
@@ -139,6 +143,80 @@ public class MainActivity extends AppCompatActivity {
         }
         if (houseReturn != null) {
             setContentView(R.layout.house);
+            houseListView = findViewById(R.id.houseListView);
+            houseButton = findViewById(R.id.houseButton);
+            houseUser = findViewById(R.id.houseUser);
+
+            houseButton.setText(eachHouse);
+            houseUser.setText(username);
+            if (houseReturn.equalsIgnoreCase("Try again")) {
+                Toast.makeText(MainActivity.this, "House currently doesn't have any floors", Toast.LENGTH_LONG).show();
+            } else {
+                try {
+                    jsonArray = new JSONArray(houseReturn);
+                    jsonObject = jsonArray.getJSONObject(0);
+
+                    floorArray = jsonObject.getJSONArray("floor");
+
+                    for (int i = 0; i < floorArray.length(); i++) {
+                        floorName.add(floorArray.getString(i));
+                    }
+                    adapterFloors = new ArrayAdapter<String>(MainActivity.this,
+                            android.R.layout.simple_list_item_1,
+                            floorName);
+                    houseListView.setAdapter(adapterFloors);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+                    houseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            eachFloor = floorName.get(position);
+                            floorClickEvent();
+                        }
+                    });
+        }
+    }
+
+    private void floorClickEvent() {
+        Floor floor = new Floor();
+        try {
+            floorReturn = floor.execute(userIdQuerystring, eachHouse, eachFloor).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace(); //handle it the way you like
+        } catch (ExecutionException e) {
+            e.printStackTrace();//handle it the way you like
+        }
+        if (houseReturn != null) {
+            setContentView(R.layout.floor);
+            floorListView = findViewById(R.id.floorListView);
+            floorButton = findViewById(R.id.floorButton);
+            floorUser = findViewById(R.id.floorUser);
+
+            floorButton.setText(eachFloor);
+            floorUser.setText(username);
+
+            if (floorReturn.equalsIgnoreCase("Try again")) {
+                Toast.makeText(MainActivity.this, "Floor currently doesn't have any rooms", Toast.LENGTH_LONG).show();
+            } else {
+                try {
+                    jsonArray = new JSONArray(floorReturn);
+                    jsonObject = jsonArray.getJSONObject(0);
+
+                    roomArray = jsonObject.getJSONArray("room");
+
+                    for (int i = 0; i < roomArray.length(); i++) {
+                        roomName.add(roomArray.getString(i));
+                    }
+                    adapterRooms = new ArrayAdapter<String>(MainActivity.this,
+                            android.R.layout.simple_list_item_1,
+                            roomName);
+                    floorListView.setAdapter(adapterRooms);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
