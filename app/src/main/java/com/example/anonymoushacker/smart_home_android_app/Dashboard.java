@@ -1,21 +1,6 @@
 package com.example.anonymoushacker.smart_home_android_app;
 
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.SystemClock;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Toast;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -57,13 +42,7 @@ public class Dashboard extends AsyncTask<String, Void, String> {
         return lineDashboard;
     }
 }
-//    String queryStringURL;
-//
 
-//
-//    JSONArray jsonArray, houseArray;
-//    JSONObject jsonObject;
-//
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
@@ -72,9 +51,6 @@ public class Dashboard extends AsyncTask<String, Void, String> {
 //        handleEvent();
 //    }
 //
-//    private void declareVariable() {
-//
-//    }
 //
 //    private void handleEvent() {
 //        Intent intent = getIntent();
@@ -134,8 +110,7 @@ public class Dashboard extends AsyncTask<String, Void, String> {
 
 ////                queryStringURL = urlString + "app.house?userid=1&housename=House 001";
 //
-//                queryStringURL = urlString + "app.house?userid="+userIdQuerystring+"&housename="+eachHouse;
-//                queryStringURL = queryStringURL.replaceAll(" ", "%20");
+
 //
 ////                queryStringURL = urlString + "app.house?userid=1&housename=House%20001";
 

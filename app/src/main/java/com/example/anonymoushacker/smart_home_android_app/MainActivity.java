@@ -3,6 +3,7 @@ package com.example.anonymoushacker.smart_home_android_app;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,17 +17,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-import javax.net.ssl.HttpsURLConnection;
-
 public class MainActivity extends AppCompatActivity {
 
     EditText textUsername, textPassword;
-    Button signin, logout;
+    Button signin, dbusername, logout;
 
     String username, password;
 
     String userIdQuerystring;
-    String resultString, dashboardReturn;
+    String resultString, dashboardReturn, houseReturn;
+    String eachHouse;
 
     JSONArray jsonArray, houseArray;
     JSONObject jsonObject;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void declareVariable() {
 
-        textUsername = findViewById(R.id.username);
+        textUsername = findViewById(R.id.houseUser);
         textPassword = findViewById(R.id.password);
         signin = findViewById(R.id.button);
         houseName = new ArrayList<>();
@@ -60,10 +60,9 @@ public class MainActivity extends AppCompatActivity {
                 Validation validation = new Validation();
                 try {
                     resultString = validation.execute(username, password).get(); // get return value from doInBackground
-                    if (resultString.equalsIgnoreCase("Try again")){
-                        Toast.makeText(MainActivity.this, ""+ resultString, Toast.LENGTH_LONG).show();
-                    }
-                    else {
+                    if (resultString.equalsIgnoreCase("Try again")) {
+                        Toast.makeText(MainActivity.this, "" + resultString, Toast.LENGTH_LONG).show();
+                    } else {
                         jsonArray = new JSONArray(resultString);
                         jsonObject = jsonArray.getJSONObject(0);
                         if (jsonObject.has("message")) {
@@ -72,19 +71,17 @@ public class MainActivity extends AppCompatActivity {
 
                             // declare listview after loading layout activity_dashboard
                             dashboardListView = findViewById(R.id.dashboard);
+                            dbusername = findViewById(R.id.houseUser);
                             dashboardEvent();
                         }
                     }
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace(); //handle it the way you like
                 } catch (ExecutionException e) {
                     e.printStackTrace();//handle it the way you like
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-//                textUsername.setText("");
-//                textPassword.setText("");
 
             }
         });
@@ -92,11 +89,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void dashboardEvent() {
         Dashboard dashboard = new Dashboard();
+        dbusername.setText(username);
 
         try {
             dashboardReturn = dashboard.execute(userIdQuerystring).get();
-        }
-        catch (InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace(); //handle it the way you like
         } catch (ExecutionException e) {
             e.printStackTrace();//handle it the way you like
@@ -116,10 +113,32 @@ public class MainActivity extends AppCompatActivity {
                         android.R.layout.simple_list_item_1,
                         houseName);
                 dashboardListView.setAdapter(adapterHouses);
+
+               } catch (JSONException e) {
+                e.printStackTrace();
             }
-            catch (JSONException e) {
-            e.printStackTrace();
-            }
+
+                dashboardListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        eachHouse = houseName.get(position);
+                        houseClickEvent();
+                    }
+                });
+        }
+    }
+
+    private void houseClickEvent() {
+        House house = new House();
+        try {
+            houseReturn = house.execute(userIdQuerystring, eachHouse).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace(); //handle it the way you like
+        } catch (ExecutionException e) {
+            e.printStackTrace();//handle it the way you like
+        }
+        if (houseReturn != null) {
+            setContentView(R.layout.house);
         }
     }
 }
