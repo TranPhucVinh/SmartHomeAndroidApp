@@ -1,40 +1,38 @@
 package com.example.anonymoushacker.smart_home_android_app;
 
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
     EditText textUsername, textPassword;
-    Button signin;
+    Button signin, logout;
 
-//    String urlString = "http://192.168.40.74:3000/";
-
-    String urlString = "http://192.168.1.22:3000/";
-    String queryStringURL;
-    String lineValidate, lineDashboard, username, password, returnString;
+    String username, password;
 
     String userIdQuerystring;
+    String resultString, dashboardReturn;
 
-    JSONArray jsonArray;
+    JSONArray jsonArray, houseArray;
     JSONObject jsonObject;
+    ListView dashboardListView;
+    ArrayAdapter<String> adapterHouses;
+    ArrayList<String> houseName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,113 +47,79 @@ public class MainActivity extends AppCompatActivity {
         textUsername = findViewById(R.id.username);
         textPassword = findViewById(R.id.password);
         signin = findViewById(R.id.button);
+        houseName = new ArrayList<>();
     }
 
     private void handleEvent() {
         signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                username = textUsername.getText().toString();
+                password = textPassword.getText().toString();
+
                 Validation validation = new Validation();
-                validation.execute();
-//                textUsername.setText("");
-//                textPassword.setText("");
                 try {
-                    returnString = jsonObject.getString("message");
-                    if (returnString.equalsIgnoreCase("Login sucessfully")) {
-                        Intent intent = new Intent(MainActivity.this,Dashboard.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString("username",username);
+                    resultString = validation.execute(username, password).get(); // get return value from doInBackground
+                    if (resultString.equalsIgnoreCase("Try again")){
+                        Toast.makeText(MainActivity.this, ""+ resultString, Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        jsonArray = new JSONArray(resultString);
+                        jsonObject = jsonArray.getJSONObject(0);
+                        if (jsonObject.has("message")) {
+                            userIdQuerystring = jsonObject.getString("id");
+                            setContentView(R.layout.activity_dashboard);
 
-                        intent.putExtra("myBundle", bundle);
-                        while (lineDashboard == null) {
-                            DashboardView dashboardView = new DashboardView();
-                            dashboardView.execute();
+                            // declare listview after loading layout activity_dashboard
+                            dashboardListView = findViewById(R.id.dashboard);
+                            dashboardEvent();
                         }
-
-                        bundle.putString("userid", userIdQuerystring);
-                        bundle.putString("house",lineDashboard);
-
-                        startActivity(intent);
-                    } else if (lineValidate.equalsIgnoreCase("Try again")) {
-                        Toast.makeText(MainActivity.this, "Try again", Toast.LENGTH_LONG).show();
                     }
                 }
-                catch (NullPointerException e){
-                    Toast.makeText(MainActivity.this, "nothing here", Toast.LENGTH_LONG).show();
-                }
-                catch (JSONException e){
+                catch (InterruptedException e) {
+                    e.printStackTrace(); //handle it the way you like
+                } catch (ExecutionException e) {
+                    e.printStackTrace();//handle it the way you like
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
+//                textUsername.setText("");
+//                textPassword.setText("");
+
             }
         });
     }
 
-    class Validation extends AsyncTask<Void, Void, Void> {
-        protected void onPreExecute() {
-            super.onPreExecute();
+    private void dashboardEvent() {
+        Dashboard dashboard = new Dashboard();
+
+        try {
+            dashboardReturn = dashboard.execute(userIdQuerystring).get();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace(); //handle it the way you like
+        } catch (ExecutionException e) {
+            e.printStackTrace();//handle it the way you like
         }
 
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-        protected Void doInBackground(Void... values) {
-            username = textUsername.getText().toString();
-            password = textPassword.getText().toString();
-
+        if (dashboardReturn != null) {
             try {
-                queryStringURL = urlString + "validate?username="+username+"&password="+password;
-
-                URL url = new URL(queryStringURL);
-                HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
-
-                connection.setRequestMethod("POST");
-                InputStreamReader inputStreamReader = new InputStreamReader(connection.getInputStream());
-                BufferedReader buffer = new BufferedReader(inputStreamReader);
-                lineValidate = buffer.readLine();
-
-                jsonArray = new JSONArray(lineValidate);
+                jsonArray = new JSONArray(dashboardReturn);
                 jsonObject = jsonArray.getJSONObject(0);
+
+                houseArray = jsonObject.getJSONArray("house");
+
+                for (int i = 0; i < houseArray.length(); i++) {
+                    houseName.add(houseArray.getString(i));
+                }
+                adapterHouses = new ArrayAdapter<String>(MainActivity.this,
+                        android.R.layout.simple_list_item_1,
+                        houseName);
+                dashboardListView.setAdapter(adapterHouses);
             }
-            catch (Exception e){
-                e.printStackTrace();
+            catch (JSONException e) {
+            e.printStackTrace();
             }
-            return null;
-        }
-    }
-    class DashboardView extends AsyncTask<Void, Void, Void> {
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-        }
-
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-        protected Void doInBackground(Void... values) {
-
-            try {
-                userIdQuerystring = jsonObject.getString("id");
-                queryStringURL = urlString + "app.dashboard?userid="+userIdQuerystring;
-
-                URL url = new URL(queryStringURL);
-                HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
-
-                connection.setRequestMethod("POST");
-                InputStreamReader inputStreamReader = new InputStreamReader(connection.getInputStream());
-                BufferedReader buffer = new BufferedReader(inputStreamReader);
-                lineDashboard = buffer.readLine();
-            }
-            catch (Exception e){
-                e.printStackTrace();
-            }
-            return null;
         }
     }
 }
