@@ -4,12 +4,12 @@ import android.os.AsyncTask;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 
 public class Validation extends AsyncTask<String, Void, String> {
 
-    String urlString = "http://192.168.1.22:3000/";
+    String urlString = "https://smarthome-thesis-bku.herokuapp.com/app/";
     String queryStringURL;
     String lineValidate, username, password;
 
@@ -29,10 +29,10 @@ public class Validation extends AsyncTask<String, Void, String> {
         password = values[1];
 
         try {
-            queryStringURL = urlString + "validate?username="+username+"&password="+password;
+            queryStringURL = urlString + "app.validate?username="+username+"&password="+password;
 
             URL url = new URL(queryStringURL);
-            HttpURLConnection connection =  (HttpURLConnection) url.openConnection();
+            HttpsURLConnection connection =  (HttpsURLConnection) url.openConnection();
 
             connection.setRequestMethod("POST");
             InputStreamReader inputStreamReader = new InputStreamReader(connection.getInputStream());

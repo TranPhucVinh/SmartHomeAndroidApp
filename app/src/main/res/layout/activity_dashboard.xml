@@ -7,7 +7,7 @@
     tools:context=".Dashboard">
 
     <Button
-        android:id="@+id/houseButton"
+        android:id="@+id/roomButton"
         android:layout_width="368dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/houseUser"
+        android:id="@+id/roomUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="17dp"
@@ -26,7 +26,7 @@
         android:layout_marginRight="10dp"
         android:text="Button"
         app:layout_constraintEnd_toStartOf="@+id/logout"
-        app:layout_constraintTop_toBottomOf="@+id/houseButton" />
+        app:layout_constraintTop_toBottomOf="@+id/roomButton" />
 
     <Button
         android:id="@+id/logout"
@@ -35,7 +35,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
         android:text="Logout"
-        app:layout_constraintBaseline_toBaselineOf="@+id/houseUser"
+        app:layout_constraintBaseline_toBaselineOf="@+id/roomUser"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <ListView

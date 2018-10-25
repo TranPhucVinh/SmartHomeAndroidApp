@@ -4,11 +4,11 @@ import android.os.AsyncTask;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
 import java.net.URL;
 
 public class Floor extends AsyncTask<String, Void, String> {
-    String urlString = "http://192.168.1.22:3000/";
+    String urlString = "https://smarthome-thesis-bku.herokuapp.com/app/";
     String userIdQuerystring, queryStringURL, eachHouse, eachFloor, lineRoom;
 
     protected void onPreExecute() {
@@ -31,7 +31,7 @@ public class Floor extends AsyncTask<String, Void, String> {
             queryStringURL = urlString + "app.floor?userid=" + userIdQuerystring + "&housename=" + eachHouse + "&floorname=" + eachFloor;
             queryStringURL = queryStringURL.replaceAll(" ", "%20");
             URL url = new URL(queryStringURL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             InputStreamReader inputStreamReader = new InputStreamReader(connection.getInputStream());
             BufferedReader buffer = new BufferedReader(inputStreamReader);

@@ -13,12 +13,12 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:text="Username"
-        app:layout_constraintBottom_toTopOf="@+id/houseUser"
+        app:layout_constraintBottom_toTopOf="@+id/roomUser"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/houseUser"
+        android:id="@+id/roomUser"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -40,7 +40,7 @@
         android:text="Password"
         app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/houseUser" />
+        app:layout_constraintTop_toBottomOf="@+id/roomUser" />
 
     <EditText
         android:id="@+id/password"

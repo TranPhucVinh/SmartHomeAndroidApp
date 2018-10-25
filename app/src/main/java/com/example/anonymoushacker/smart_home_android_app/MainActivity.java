@@ -22,19 +22,19 @@ public class MainActivity extends AppCompatActivity {
     EditText textUsername, textPassword;
     Button signin, logout;
 
-    Button dbusername, houseButton, houseUser, floorButton, floorUser;
+    Button dbusername, houseButton, houseUser, floorButton, floorUser, roomButton, roomUser;
 
     String username, password;
 
     String userIdQuerystring;
-    String resultString, dashboardReturn, houseReturn, floorReturn;
+    String resultString, dashboardReturn, houseReturn, floorReturn, roomReturn;
     String eachHouse, eachFloor, eachRoom;
 
-    JSONArray jsonArray, houseArray, floorArray, roomArray;
+    JSONArray jsonArray, houseArray, floorArray, roomArray, deviceArray;
     JSONObject jsonObject;
     ListView dashboardListView, houseListView, floorListView, roomListView;
-    ArrayAdapter<String> adapterHouses, adapterFloors, adapterRooms;
-    ArrayList<String> houseName, floorName, roomName;
+    ArrayAdapter<String> adapterHouses, adapterFloors, adapterRooms, adapterDevices;
+    ArrayList<String> houseName, floorName, roomName, deviceName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +46,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void declareVariable() {
 
-        textUsername = findViewById(R.id.houseUser);
+        textUsername = findViewById(R.id.roomUser);
         textPassword = findViewById(R.id.password);
         signin = findViewById(R.id.button);
         houseName = new ArrayList<>();
         floorName = new ArrayList<>();
         roomName  = new ArrayList<>();
+        deviceName = new ArrayList<>();
     }
 
     private void handleEvent() {
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
                             // declare listview after loading layout activity_dashboard
                             dashboardListView = findViewById(R.id.dashboard);
-                            dbusername = findViewById(R.id.houseUser);
+                            dbusername = findViewById(R.id.roomUser);
                             dashboardEvent();
                         }
                     }
@@ -86,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
             }
         });
     }
@@ -144,8 +144,8 @@ public class MainActivity extends AppCompatActivity {
         if (houseReturn != null) {
             setContentView(R.layout.house);
             houseListView = findViewById(R.id.houseListView);
-            houseButton = findViewById(R.id.houseButton);
-            houseUser = findViewById(R.id.houseUser);
+            houseButton = findViewById(R.id.roomButton);
+            houseUser = findViewById(R.id.roomUser);
 
             houseButton.setText(eachHouse);
             houseUser.setText(username);
@@ -213,6 +213,53 @@ public class MainActivity extends AppCompatActivity {
                             android.R.layout.simple_list_item_1,
                             roomName);
                     floorListView.setAdapter(adapterRooms);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            floorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    eachRoom = roomName.get(position);
+                    roomClickEvent();
+                }
+            });
+        }
+    }
+
+    private void roomClickEvent() {
+        Room room = new Room();
+        try {
+            roomReturn = room.execute(userIdQuerystring, eachHouse, eachFloor, eachRoom).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace(); //handle it the way you like
+        } catch (ExecutionException e) {
+            e.printStackTrace();//handle it the way you like
+        }
+        if (roomReturn != null) {
+            setContentView(R.layout.room);
+            roomListView = findViewById(R.id.roomListView);
+            roomButton = findViewById(R.id.roomButton);
+            roomUser = findViewById(R.id.roomUser);
+
+            roomButton.setText(eachRoom);
+            roomUser.setText(username);
+
+            if (roomReturn.equalsIgnoreCase("Try again")) {
+                Toast.makeText(MainActivity.this, "Room currently doesn't have any devices", Toast.LENGTH_LONG).show();
+            } else {
+                try {
+                    jsonArray = new JSONArray(roomReturn);
+
+                    jsonObject = jsonArray.getJSONObject(0);
+                    deviceArray = jsonObject.getJSONArray("room");
+                    for (int i = 0; i < deviceArray.length(); i++) {
+                        deviceName.add(deviceArray.getString(i));
+                    }
+                    adapterDevices = new ArrayAdapter<String>(MainActivity.this,
+                            android.R.layout.simple_list_item_1,
+                            deviceName);
+                    roomListView.setAdapter(adapterDevices);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
