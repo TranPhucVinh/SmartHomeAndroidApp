@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     String eachHouse, eachFloor, eachRoom;
 
     JSONArray jsonArray, houseArray, floorArray, roomArray, deviceArray;
-    JSONObject jsonObject;
+    JSONObject jsonObject, jsonName;
     ListView dashboardListView, houseListView, floorListView, roomListView;
     ArrayAdapter<String> adapterHouses, adapterFloors, adapterRooms, adapterDevices;
     ArrayList<String> houseName, floorName, roomName, deviceName;
@@ -250,11 +250,11 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 try {
                     jsonArray = new JSONArray(roomReturn);
-
                     jsonObject = jsonArray.getJSONObject(0);
                     deviceArray = jsonObject.getJSONArray("room");
                     for (int i = 0; i < deviceArray.length(); i++) {
-                        deviceName.add(deviceArray.getString(i));
+                        jsonName = new JSONObject(deviceArray.getString(i));
+                        deviceName.add(jsonName.getString("name"));
                     }
                     adapterDevices = new ArrayAdapter<String>(MainActivity.this,
                             android.R.layout.simple_list_item_1,
