@@ -2,11 +2,15 @@ package com.example.anonymoushacker.smart_home_android_app;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,8 +37,10 @@ public class MainActivity extends AppCompatActivity {
     JSONArray jsonArray, houseArray, floorArray, roomArray, deviceArray;
     JSONObject jsonObject, jsonName;
     ListView dashboardListView, houseListView, floorListView, roomListView;
+    RecyclerView recyclerView;
     ArrayAdapter<String> adapterHouses, adapterFloors, adapterRooms, adapterDevices;
-    ArrayList<String> houseName, floorName, roomName, deviceName;
+    DisplayAdapter displayAdapter;
+    ArrayList<String> houseName, floorName, roomName, deviceName, deviceType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         floorName = new ArrayList<>();
         roomName  = new ArrayList<>();
         deviceName = new ArrayList<>();
+        deviceType = new ArrayList<>();
     }
 
     private void handleEvent() {
@@ -238,7 +245,8 @@ public class MainActivity extends AppCompatActivity {
         }
         if (roomReturn != null) {
             setContentView(R.layout.room);
-            roomListView = findViewById(R.id.roomListView);
+//            roomListView = findViewById(R.id.roomListView);
+            recyclerView = findViewById(R.id.recyclerView);
             roomButton = findViewById(R.id.roomButton);
             roomUser = findViewById(R.id.roomUser);
 
@@ -255,11 +263,19 @@ public class MainActivity extends AppCompatActivity {
                     for (int i = 0; i < deviceArray.length(); i++) {
                         jsonName = new JSONObject(deviceArray.getString(i));
                         deviceName.add(jsonName.getString("name"));
+                        deviceType.add(jsonName.getString("type"));
                     }
-                    adapterDevices = new ArrayAdapter<String>(MainActivity.this,
-                            android.R.layout.simple_list_item_1,
-                            deviceName);
-                    roomListView.setAdapter(adapterDevices);
+
+//                    adapterDevices = new ArrayAdapter<String>(MainActivity.this,
+//                            android.R.layout.simple_list_item_1,
+//                            deviceType);
+//                    roomListView.setAdapter(adapterDevices);
+                    recyclerView.setHasFixedSize(true);
+                    LinearLayoutManager linearLayout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                    recyclerView.setLayoutManager(linearLayout);
+                    displayAdapter = new DisplayAdapter(getApplicationContext(),
+                    deviceType, deviceName);
+                    recyclerView.setAdapter(displayAdapter);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
