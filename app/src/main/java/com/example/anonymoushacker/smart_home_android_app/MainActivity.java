@@ -1,7 +1,7 @@
 package com.example.anonymoushacker.smart_home_android_app;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -9,9 +9,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -28,19 +27,23 @@ public class MainActivity extends AppCompatActivity {
 
     Button dbusername, houseButton, houseUser, floorButton, floorUser, roomButton, roomUser;
 
+    Switch digitalSwitch;
+
     String username, password;
 
     String userIdQuerystring;
     String resultString, dashboardReturn, houseReturn, floorReturn, roomReturn;
     String eachHouse, eachFloor, eachRoom;
+    String currentDeviceStatus;
 
     JSONArray jsonArray, houseArray, floorArray, roomArray, deviceArray;
     JSONObject jsonObject, jsonName;
-    ListView dashboardListView, houseListView, floorListView, roomListView;
+    ListView dashboardListView, houseListView, floorListView;
     RecyclerView recyclerView;
     ArrayAdapter<String> adapterHouses, adapterFloors, adapterRooms, adapterDevices;
     DisplayAdapter displayAdapter;
     ArrayList<String> houseName, floorName, roomName, deviceName, deviceType;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         declareVariable();
         handleEvent();
+
     }
 
     private void declareVariable() {
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         textUsername = findViewById(R.id.roomUser);
         textPassword = findViewById(R.id.password);
         signin = findViewById(R.id.button);
+        digitalSwitch = findViewById(R.id.digitalSwitch);
         houseName = new ArrayList<>();
         floorName = new ArrayList<>();
         roomName  = new ArrayList<>();
@@ -236,6 +241,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void roomClickEvent() {
         Room room = new Room();
+        DeviceStatus deviceStatus = new DeviceStatus();
+        try {
+            currentDeviceStatus = deviceStatus.execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace(); //handle it the way you like
+        } catch (ExecutionException e) {
+            e.printStackTrace();//handle it the way you like
+        }
+
         try {
             roomReturn = room.execute(userIdQuerystring, eachHouse, eachFloor, eachRoom).get();
         } catch (InterruptedException e) {
@@ -245,7 +259,6 @@ public class MainActivity extends AppCompatActivity {
         }
         if (roomReturn != null) {
             setContentView(R.layout.room);
-//            roomListView = findViewById(R.id.roomListView);
             recyclerView = findViewById(R.id.recyclerView);
             roomButton = findViewById(R.id.roomButton);
             roomUser = findViewById(R.id.roomUser);
@@ -266,16 +279,13 @@ public class MainActivity extends AppCompatActivity {
                         deviceType.add(jsonName.getString("type"));
                     }
 
-//                    adapterDevices = new ArrayAdapter<String>(MainActivity.this,
-//                            android.R.layout.simple_list_item_1,
-//                            deviceType);
-//                    roomListView.setAdapter(adapterDevices);
                     recyclerView.setHasFixedSize(true);
                     LinearLayoutManager linearLayout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
                     recyclerView.setLayoutManager(linearLayout);
                     displayAdapter = new DisplayAdapter(getApplicationContext(),
-                    deviceType, deviceName);
+                    deviceType, deviceName, currentDeviceStatus);
                     recyclerView.setAdapter(displayAdapter);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
