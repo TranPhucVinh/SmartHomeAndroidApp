@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -149,6 +150,8 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.ViewHold
         }
         catch (JSONException e) {
             e.printStackTrace();
+        } catch (NullPointerException e){
+            Toast.makeText(context.getApplicationContext(), "Server hasn't turned on", Toast.LENGTH_LONG).show();
         }
     }
 
