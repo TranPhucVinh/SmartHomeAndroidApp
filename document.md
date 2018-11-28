@@ -10,3 +10,9 @@ displayAdapter = new DisplayAdapter(getApplicationContext(),
 To control devices: use protocol Websocket. Use library OKHTTP: okhttp-3.11.0.jar
 
 Control devices: [Control devices](https://github.com/TranPhucVinh/Android/tree/master/PROJECTS/Control%20devices)
+
+### Add OKHTTP jar to project
+
+In tab ``1.Project``, change from ``Android`` to ``Project``
+
+Right click in the name of the project, go to ``Open module settings``. Go to ``Modules`` -> ``apps``
