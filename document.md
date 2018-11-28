@@ -15,4 +15,4 @@ Control devices: [Control devices](https://github.com/TranPhucVinh/Android/tree/
 
 In tab ``1.Project``, change from ``Android`` to ``Project``
 
-Right click in the name of the project, go to ``Open module settings``. Go to ``Modules`` -> ``apps``
+Right click in the name of the project, go to ``Open module settings``. Go to ``Dependencies``, press plus symbol and find module okhttp
